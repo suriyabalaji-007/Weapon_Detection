@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intelligence Report | Weapon Detection System</title>
+    <!-- Styles -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="bg-gradient-to-br from-slate-100 to-slate-200 min-h-screen pb-20">
+    
+    <nav class="glass-card !rounded-none !border-0 !border-b border-slate-200 sticky top-0 z-50 px-6 py-4">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-extrabold text-slate-800 tracking-tight">SecuritySentinel v2</h1>
+            <div class="flex items-center gap-4">
+                <a href="/detection" class="btn-premium btn-premium-primary !py-2 !px-4 text-xs">New Case</a>
+                <a href="/logout" class="btn-premium btn-premium-danger !py-2 !px-4 text-xs">Terminate</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-6 py-12 animate-fade-in">
+        
+        <header class="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
+            <div>
+                <div class="flex items-center gap-2 mb-2">
+                    <span class="badge badge-info">Forensic Intel</span>
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Report #{{ result_image.split('_')[0] if result_image else '0000' }}</span>
+                </div>
+                <h2 class="text-4xl font-extrabold text-slate-900 tracking-tight">Intelligence Post-Analysis</h2>
+            </div>
+            <div class="text-right">
+                <p class="text-slate-500 font-bold text-sm uppercase">Timestamp</p>
+                <p class="text-slate-900 font-black">{{ now.strftime('%Y-%m-%d %H:%M:%S') if now else 'Live' }}</p>
+            </div>
+        </header>
+
+        {% if email_sent %}
+            <section class="mb-10 p-6 glass-card bg-emerald-50/50 border-emerald-200 border-2 rounded-2xl flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-emerald-500 rounded-xl flex items-center justify-center text-white shadow-lg">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h4 class="text-emerald-900 font-bold">Alert Protocol Active</h4>
+                        <p class="text-emerald-700 text-sm font-medium">{{ email_message }}</p>
+                    </div>
+                </div>
+                <span class="badge badge-success">Encrypted Dispatch</span>
+            </section>
+        {% endif %}
+
+        <div class="grid grid-cols-1 xl:grid-cols-3 gap-10">
+            
+            <!-- Visual Evidence Center -->
+            <div class="xl:col-span-2 flex flex-col gap-6">
+                <div class="glass-card p-6 min-h-[500px] flex flex-col">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-lg font-black text-slate-800 uppercase tracking-wider flex items-center gap-2">
+                            <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                            </svg>
+                            Visual Evidence #01
+                        </h3>
+                        <a href="{{ url_for('static', filename='uploads/' + result_image) }}" download class="text-blue-600 hover:text-blue-800 text-xs font-black uppercase flex items-center gap-1 border-b-2 border-transparent hover:border-blue-600 transition-all">
+                            Export Raw Frame
+                        </a>
+                    </div>
+                    
+                    <div class="bg-black rounded-2xl overflow-hidden relative flex-grow flex items-center justify-center">
+                        {% if input_type == 'video' %}
+                            <video id="resultVideo" controls class="w-full h-full object-contain">
+                                <source src="{{ url_for('serve_video', filename=result_image) }}" type="video/mp4">
+                            </video>
+                        {% else %}
+                            <img src="{{ url_for('static', filename='uploads/' + result_image) }}" class="w-full h-full object-contain" alt="Evidence Analysis">
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="glass-card p-8 bg-blue-50/30">
+                    <h4 class="text-xs font-black text-blue-800 uppercase tracking-[0.2em] mb-4">Neural Network Log</h4>
+                    <p class="text-slate-600 text-sm leading-relaxed font-medium">
+                        Input source recognized as <span class="text-blue-600 font-bold">{{ input_type }}</span>. Intelligence processed across 80+ detection layers with dynamic behavioral weighting enabled. All identified threats are bounding-boxed in the visual evidence above.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Intelligence Dashboard -->
+            <div class="flex flex-col gap-6">
+                
+                <!-- Assessment Score -->
+                <div class="glass-card p-8 {% if 'CRITICAL' in threat_level %}bg-red-900 text-white{% else %}bg-slate-900 text-white{% endif %} text-center pulse-glow">
+                    <h4 class="text-[10px] font-black uppercase tracking-[0.3em] opacity-60 mb-2">Overall Assessment</h4>
+                    <div class="text-3xl font-black tracking-tighter leading-none mb-4">
+                        {{ threat_level }}
+                    </div>
+                    <div class="w-full bg-white/20 h-1.5 rounded-full overflow-hidden">
+                        <div class="bg-white h-full" style="width: 85%;"></div>
+                    </div>
+                </div>
+
+                <!-- Detected Objects -->
+                <div class="glass-card p-8">
+                    <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-6 border-b border-slate-100 pb-2">Weapon Identification</h3>
+                    {% if weapons_detected %}
+                        <div class="space-y-4">
+                            {% for weapon in weapons_detected %}
+                                <div class="flex items-center justify-between p-4 bg-red-50 rounded-2xl border border-red-100">
+                                    <span class="font-extrabold text-slate-800">{{ weapon.class|upper }}</span>
+                                    <span class="badge badge-danger">{{ weapon.confidence }}% CONF</span>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="flex flex-col items-center py-6 text-emerald-600 text-center">
+                            <svg class="w-10 h-10 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <span class="font-black text-xs">NO WEAPONS DETECTED</span>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Behavioral Biometrics -->
+                <div class="glass-card p-8">
+                    <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-6 border-b border-slate-100 pb-2">Behavioral Biometrics</h3>
+                    {% if behaviors_detected %}
+                        <div class="space-y-4">
+                            {% for behavior in behaviors_detected %}
+                                <div class="p-4 bg-amber-50 rounded-2xl border border-amber-100">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <span class="font-extrabold text-slate-800 text-sm leading-tight">{{ behavior.behavior|upper }}</span>
+                                        <span class="text-[10px] font-black text-amber-700 bg-amber-200/50 px-2 py-0.5 rounded">{{ behavior.confidence }}%</span>
+                                    </div>
+                                    <div class="text-[10px] text-amber-900 font-bold uppercase tracking-wider opacity-60">
+                                        Emotion: {{ behavior.dominant_emotion }}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                       <div class="flex flex-col items-center py-6 text-slate-400 text-center">
+                            <svg class="w-10 h-10 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path>
+                            </svg>
+                            <span class="font-black text-xs">NO FACIAL SIGNATURES</span>
+                        </div>
+                    {% endif %}
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+</body>
+</html>

@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analysis Panel | Weapon Detection System</title>
+    <!-- Styles -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="bg-gradient-to-br from-slate-100 to-slate-200 min-h-screen">
+    
+    <nav class="glass-card !rounded-none !border-0 !border-b border-slate-200 sticky top-0 z-50 px-6 py-4">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                    </svg>
+                </div>
+                <h1 class="text-xl font-extrabold text-slate-800 tracking-tight">SecuritySentinel v2</h1>
+            </div>
+            <div class="flex items-center gap-6">
+                <div class="hidden md:flex flex-col items-end">
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Operator</span>
+                    <span class="text-sm font-bold text-slate-700">{{ username }}</span>
+                </div>
+                <a href="/logout" class="btn-premium btn-premium-danger !py-2 !px-4 text-xs">
+                    Terminate Session
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-5xl mx-auto px-6 py-12 animate-fade-in">
+        
+        <header class="text-center mb-12">
+            <h2 class="text-4xl font-extrabold text-slate-900 tracking-tight mb-4">Threat Analysis Portal</h2>
+            <p class="text-slate-500 max-w-2xl mx-auto font-medium leading-relaxed">
+                Deploy advanced computer vision models to identify weapons and behavioral threats in real-time. Choose your intelligence source below.
+            </p>
+        </header>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="mb-8 p-5 rounded-2xl flex items-center gap-4 animate-fade-in {% if category == 'error' %}bg-red-50 text-red-700 border-2 border-red-100{% else %}bg-emerald-50 text-emerald-700 border-2 border-emerald-100{% endif %}">
+                        <span class="font-bold">{{ message }}</span>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Intelligence Source Selector -->
+        <div class="glass-card p-10 mb-10 text-center">
+            <h3 class="text-lg font-bold text-slate-800 mb-8 uppercase tracking-widest">Select Signal Input</h3>
+            <div class="flex flex-wrap justify-center gap-8">
+                <label class="group cursor-pointer">
+                    <input type="radio" name="input_type" value="image" class="sr-only source-radio" checked>
+                    <div class="source-card p-6 w-40 rounded-2xl border-2 border-transparent transition-all group-hover:bg-blue-50/50">
+                        <div class="w-16 h-16 mx-auto mb-4 bg-slate-100 rounded-2xl flex items-center justify-center text-slate-400 source-icon transition-colors">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                            </svg>
+                        </div>
+                        <span class="text-sm font-bold text-slate-500 source-label">Static Image</span>
+                    </div>
+                </label>
+                
+                <label class="group cursor-pointer">
+                    <input type="radio" name="input_type" value="video" class="sr-only source-radio">
+                    <div class="source-card p-6 w-40 rounded-2xl border-2 border-transparent transition-all group-hover:bg-blue-50/50">
+                        <div class="w-16 h-16 mx-auto mb-4 bg-slate-100 rounded-2xl flex items-center justify-center text-slate-400 source-icon transition-colors">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                            </svg>
+                        </div>
+                        <span class="text-sm font-bold text-slate-500 source-label">Visual Stream</span>
+                    </div>
+                </label>
+                
+                <label class="group cursor-pointer">
+                    <input type="radio" name="input_type" value="webcam" class="sr-only source-radio">
+                    <div class="source-card p-6 w-40 rounded-2xl border-2 border-transparent transition-all group-hover:bg-blue-50/50">
+                        <div class="w-16 h-16 mx-auto mb-4 bg-slate-100 rounded-2xl flex items-center justify-center text-slate-400 source-icon transition-colors">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            </svg>
+                        </div>
+                        <span class="text-sm font-bold text-slate-500 source-label">Live Node</span>
+                    </div>
+                </label>
+            </div>
+        </div>
+
+        <!-- Dynamic Drop-Zones -->
+        <section id="upload-panel" class="animate-fade-in">
+            <!-- Image Panel -->
+            <div id="image-panel" class="glass-card p-10">
+                <form method="POST" action="/detect" enctype="multipart/form-data" class="space-y-8">
+                    <input type="hidden" name="input_type" value="image">
+                    <div class="border-4 border-dashed border-slate-200 rounded-3xl p-12 text-center hover:border-blue-400 transition-colors cursor-pointer group bg-white/30" onclick="document.getElementById('img-input').click()">
+                        <div class="w-24 h-24 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
+                            <svg class="w-10 h-10 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                            </svg>
+                        </div>
+                        <h4 class="text-2xl font-bold text-slate-800 mb-2">Initialize Intelligence</h4>
+                        <p class="text-slate-500 font-medium">Drag and drop or click to upload forensic images</p>
+                        <input type="file" name="file" id="img-input" accept="image/*" class="hidden" onchange="this.form.submit()">
+                    </div>
+                    <button type="submit" class="btn-premium btn-premium-primary w-full py-4 text-xl">
+                        Deploy Detection Engine
+                    </button>
+                </form>
+            </div>
+
+            <!-- Video Panel -->
+            <div id="video-panel" class="glass-card p-10 hidden">
+                <form method="POST" action="/detect" enctype="multipart/form-data" class="space-y-8">
+                    <input type="hidden" name="input_type" value="video">
+                    <div class="border-4 border-dashed border-slate-200 rounded-3xl p-12 text-center bg-white/30">
+                        <input type="file" name="file" accept="video/*" class="input-premium py-12 mb-6" id="vid-input">
+                        <p class="text-slate-500 font-bold mb-4">MAX FILE SIZE: 100MB</p>
+                    </div>
+                    <button type="submit" class="btn-premium btn-premium-primary w-full py-4 text-xl">
+                        Process Multi-Frame Stream
+                    </button>
+                </form>
+            </div>
+
+            <!-- Webcam Panel -->
+            <div id="webcam-panel" class="glass-card p-8 border-2 border-blue-500/20 hidden">
+                <div class="flex flex-col lg:flex-row gap-8">
+                    <div class="lg:w-2/3">
+                        <div class="video-premium-container aspect-video relative" id="cam-container">
+                            <div class="video-loading-overlay" id="cam-idle">
+                                <div class="w-20 h-20 bg-blue-600/20 rounded-full flex items-center justify-center mb-4">
+                                    <svg class="w-10 h-10 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                    </svg>
+                                </div>
+                                <p class="font-bold tracking-widest text-slate-400">NODE STANDBY</p>
+                            </div>
+                            <img id="cam-stream" src="" class="w-full h-full object-cover hidden" alt="Security Feed">
+                        </div>
+                    </div>
+                    <div class="lg:w-1/3 flex flex-col gap-6">
+                        <button id="btn-start-node" class="btn-premium btn-premium-primary py-6 animate-pulse">
+                            ACTIVE NODE
+                        </button>
+                        <button id="btn-stop-node" class="btn-premium btn-premium-danger hidden">
+                            DEACTIVATE
+                        </button>
+                        
+                        <div class="bg-slate-900 rounded-2xl p-6 shadow-2xl overflow-hidden mt-auto">
+                            <div class="flex items-center justify-between mb-4">
+                                <span class="text-red-500 font-black text-xs tracking-tighter uppercase pulse-glow px-2 py-1 border border-red-500/50 rounded">Live Telemetry</span>
+                                <div class="flex gap-1">
+                                    <div class="w-2 h-2 bg-red-600 rounded-full animate-ping"></div>
+                                </div>
+                            </div>
+                            <div class="space-y-4">
+                                <div>
+                                    <h5 class="text-slate-500 text-[10px] uppercase font-bold tracking-widest mb-2">Detected Objects</h5>
+                                    <div id="telemetry-weapons" class="text-white font-mono text-sm leading-relaxed">System Ready...</div>
+                                </div>
+                                <div>
+                                    <h5 class="text-slate-500 text-[10px] uppercase font-bold tracking-widest mb-2">Behavior Analysis</h5>
+                                    <div id="telemetry-behaviors" class="text-white font-mono text-sm leading-relaxed">Scanning...</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // Professional Selector Logic
+        document.querySelectorAll('.source-radio').forEach(radio => {
+            radio.addEventListener('change', function() {
+                // Update styling
+                document.querySelectorAll('.source-card').forEach(c => {
+                    c.classList.remove('bg-blue-600/10', 'border-blue-500');
+                    c.querySelector('.source-icon').classList.replace('bg-blue-600', 'bg-slate-100');
+                    c.querySelector('.source-icon').classList.replace('text-white', 'text-slate-400');
+                    c.querySelector('.source-label').classList.replace('text-blue-700', 'text-slate-500');
+                });
+
+                const card = this.closest('label').querySelector('.source-card');
+                card.classList.add('bg-blue-600/10', 'border-blue-500');
+                card.querySelector('.source-icon').classList.replace('bg-slate-100', 'bg-blue-600');
+                card.querySelector('.source-icon').classList.replace('text-slate-400', 'text-white');
+                card.querySelector('.source-label').classList.replace('text-slate-500', 'text-blue-700');
+
+                // Toggle visibility
+                ['image', 'video', 'webcam'].forEach(p => {
+                    document.getElementById(p + '-panel').classList.add('hidden');
+                });
+                document.getElementById(this.value + '-panel').classList.remove('hidden');
+            });
+        });
+
+        // Live Node Logic
+        let nodeActive = false;
+        let teleInterval;
+
+        const startBtn = document.getElementById('btn-start-node');
+        const stopBtn = document.getElementById('btn-stop-node');
+        const camStream = document.getElementById('cam-stream');
+        const camIdle = document.getElementById('cam-idle');
+
+        startBtn.addEventListener('click', async () => {
+            const res = await fetch('/start_camera');
+            const data = await res.json();
+            if(data.status === 'success') {
+                nodeActive = true;
+                startBtn.classList.add('hidden');
+                stopBtn.classList.remove('hidden');
+                camStream.classList.remove('hidden');
+                camIdle.classList.add('hidden');
+                camStream.src = '/video_feed';
+                teleInterval = setInterval(refreshTelemetry, 800);
+            }
+        });
+
+        stopBtn.addEventListener('click', async () => {
+             const res = await fetch('/stop_camera');
+             const data = await res.json();
+             if(data.status === 'success') {
+                nodeActive = false;
+                stopBtn.classList.add('hidden');
+                startBtn.classList.remove('hidden');
+                camStream.classList.add('hidden');
+                camIdle.classList.remove('hidden');
+                camStream.src = '';
+                clearInterval(teleInterval);
+             }
+        });
+
+        async function refreshTelemetry() {
+            if(!nodeActive) return;
+            const res = await fetch('/get_detection_status');
+            const data = await res.json();
+            
+            const wList = document.getElementById('telemetry-weapons');
+            wList.innerHTML = data.weapons.length > 0 
+                ? data.weapons.map(w => `<div class="text-blue-400">> ${w.class.toUpperCase()} ${w.confidence}%</div>`).join('')
+                : '<div class="text-slate-600">> NO OBJECTS DETECTED</div>';
+
+            const bList = document.getElementById('telemetry-behaviors');
+            bList.innerHTML = data.behaviors.length > 0 
+                ? data.behaviors.map(b => `<div class="text-amber-400">> ${b.behavior.toUpperCase()}</div>`).join('')
+                : '<div class="text-slate-600">> SCANNING BIOMETRICS...</div>';
+        }
+
+        // Initialize UI
+        document.querySelector('.source-radio[checked]').dispatchEvent(new Event('change'));
+    </script>
+
+</body>
+</html>

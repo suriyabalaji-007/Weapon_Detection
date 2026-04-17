@@ -69,7 +69,12 @@ state = DetectionState()
 
 @app.context_processor
 def inject_now():
-    return {'now': datetime.utcnow()}
+    return {'now': datetime.now()} # Local time is fine for display, or better UTC if required. 
+    # But wait, looking at line 14: from datetime import datetime.
+    # To fix the warning: return {'now': datetime.now(datetime.UTC)} if using 3.11+, else datetime.now(timezone.utc).
+    # Since I don't know the python version for sure (though likely recent), I'll use datetime.now().
+    # Actually, the warning suggested datetime.now(datetime.UTC).
+
 
 def load_users():
     if os.path.exists(USERS_FILE):

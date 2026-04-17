@@ -10,10 +10,18 @@
 </head>
 <body class="bg-gradient-to-br from-slate-100 to-slate-200 min-h-screen pb-20">
     
-    <nav class="glass-card !rounded-none !border-0 !border-b border-slate-200 sticky top-0 z-50 px-6 py-4">
+    <nav class="glass-card !rounded-none !border-0 !border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50 px-6 py-4">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
-            <h1 class="text-xl font-extrabold text-slate-800 tracking-tight">SecuritySentinel v2</h1>
+            <h1 class="text-xl font-extrabold text-slate-800 dark:text-slate-100 tracking-tight">SecuritySentinel v2</h1>
             <div class="flex items-center gap-4">
+                <button id="theme-toggle" class="theme-toggle-btn" title="Toggle Theme">
+                    <svg class="w-5 h-5 light-only" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                    </svg>
+                    <svg class="w-5 h-5 dark-only" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 9h-1m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                    </svg>
+                </button>
                 <a href="/detection" class="btn-premium btn-premium-primary !py-2 !px-4 text-xs">New Case</a>
                 <a href="/logout" class="btn-premium btn-premium-danger !py-2 !px-4 text-xs">Terminate</a>
             </div>
@@ -158,5 +166,16 @@
 
     </main>
 
+    <script>
+        const themeBtn = document.getElementById('theme-toggle');
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', currentTheme);
+
+        themeBtn.addEventListener('click', () => {
+            const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+        });
+    </script>
 </body>
 </html>

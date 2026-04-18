@@ -1,5 +1,5 @@
 [build]
-  publish = "weapon1/public"
+  publish = "public"
   command = "echo 'Static build complete'"
 
 [[redirects]]
